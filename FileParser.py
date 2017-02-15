@@ -12,6 +12,12 @@ class FileParser(object):
         try:
             # Initialize Object
             self.infile = open(fname, 'r')
+            self.blacklist = set()
+
+            # Initialize Blacklist
+            with open('blacklist.txt', 'r') as bf:
+                for word in bf:
+                    self.blacklist.add(word.lower().strip())
 
         except FileNotFoundError:
             print("File ", fname, " Not Found... Exiting")
@@ -19,15 +25,23 @@ class FileParser(object):
 
     def __del__(self):
         # Close File
-        if hasattr(self, 'file'):
+        if hasattr(self, 'infile'):
             self.infile.close
 
     # Returns Map of Word Count
     # If not or non precedes the word, the count is -1 for that instance
+    @staticmethod
     def cleanse(s: str):
         count = defaultdict(int)
 
-        s = ''.join(s.filter((string.ascii_lowercase + ' ').__contains__))
+        s = ''.join(filter((string.ascii_lowercase + ' ').__contains__, s))
+        s = s.split()
+
+        # Parse Each Word Found in the String
+        for x in s:
+            # Ignore 1 length words
+            if(len(x) > 1):
+                continue
         return count
 
 
