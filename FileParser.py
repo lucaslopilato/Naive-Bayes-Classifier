@@ -3,7 +3,6 @@
 # Extracts useful information relative to Machine Problem 1
 import sys
 import string
-from collections import defaultdict
 
 
 class FileParser(object):
@@ -13,11 +12,17 @@ class FileParser(object):
             # Initialize Object
             self.infile = open(fname, 'r')
             self.blacklist = set()
+            self.negation = set()
 
             # Initialize Blacklist
-            with open('blacklist.txt', 'r') as bf:
+            with open('input/blacklist.txt', 'r') as bf:
                 for word in bf:
                     self.blacklist.add(word.lower().strip())
+
+            # Initialize Negation Dictionary
+            with open('input/negation.txt', 'r') as neg:
+                for word in neg:
+                    self.negation.add(word.lower().strip())
 
         except FileNotFoundError:
             print("File ", fname, " Not Found... Exiting")
@@ -30,18 +35,34 @@ class FileParser(object):
 
     # Returns Map of Word Count
     # If not or non precedes the word, the count is -1 for that instance
-    @staticmethod
-    def cleanse(s: str):
-        count = defaultdict(int)
+    def cleanse(self, s: str):
+        count = {}
 
-        s = ''.join(filter((string.ascii_lowercase + ' ').__contains__, s))
+        s = ''.join(c.lower() for c in s if c in string.ascii_letters + ' ')
         s = s.split()
+
+        # Detects whether negation detected
+        neg = 1
 
         # Parse Each Word Found in the String
         for x in s:
             # Ignore 1 length words
-            if(len(x) > 1):
+            if(len(x) <= 1):
                 continue
+
+            # Check for negation
+            if x in self.negation:
+                neg *= -1
+                continue
+
+            # Update the count for the word
+            if x in count:
+                count[x] += neg
+            else:
+                count[x] = neg
+
+            # Reset Negation
+            neg = 1 
         return count
 
 
@@ -49,8 +70,7 @@ class TrainingParser(FileParser):
 
     def __init__(self, fname):
         FileParser.__init__(self, fname)
-        self.positiveWords = defaultdict(int)
-        self.negativeWords = defaultdict(int)
+
 
     def __del__(self):
         FileParser.__del__(self)

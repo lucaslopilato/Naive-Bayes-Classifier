@@ -16,8 +16,8 @@ class NaiveBayesClassifier(object):
         NaiveBayesClassifier.py training.txt testing.txt")"""
 
         # Open FileParsers
-        train = TrainingParser("training.txt")
-        test = TestParser("testing.txt")
+        train = TrainingParser("input/training.txt")
+        test = TestParser("input/testing.txt")
 
 
 init = NaiveBayesClassifier()
