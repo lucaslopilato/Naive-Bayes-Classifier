@@ -30,6 +30,5 @@ class TestFileParser(unittest.TestCase):
             {'tim': 1, 'me': -1})
 
 
-
 if __name__ == '__main__':
     unittest.main()

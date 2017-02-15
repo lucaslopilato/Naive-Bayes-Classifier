@@ -35,10 +35,10 @@ class FileParser(object):
 
     # Returns Map of Word Count
     # If not or non precedes the word, the count is -1 for that instance
-    def cleanse(self, s: str):
+    def cleanse(self, s):
         count = {}
 
-        s = ''.join(c.lower() for c in s if c in string.ascii_letters + ' ')
+        s = ''.join(c for c in s.lower() if c in string.ascii_letters + ' ')
         s = s.split()
 
         # Detects whether negation detected
@@ -62,7 +62,7 @@ class FileParser(object):
                 count[x] = neg
 
             # Reset Negation
-            neg = 1 
+            neg = 1
         return count
 
 
@@ -70,7 +70,6 @@ class TrainingParser(FileParser):
 
     def __init__(self, fname):
         FileParser.__init__(self, fname)
-
 
     def __del__(self):
         FileParser.__del__(self)
