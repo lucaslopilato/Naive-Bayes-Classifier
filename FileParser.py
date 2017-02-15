@@ -45,8 +45,6 @@ class FileParser(object):
         return count
 
 
-
-
 class TrainingParser(FileParser):
 
     def __init__(self, fname):
