@@ -18,3 +18,6 @@ class NaiveBayesClassifier(object):
         # Open FileParsers
         train = TrainingParser("training.txt")
         test = TestParser("testing.txt")
+
+
+init = NaiveBayesClassifier()
