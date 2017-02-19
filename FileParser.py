@@ -1,6 +1,8 @@
 # fileParser.py
 # Class Responsible for handling all file IO
 # Extracts useful information relative to Machine Problem 1
+
+# Stop words located at http://xpo6.com/list-of-english-stop-words/
 import sys
 import string
 
@@ -11,13 +13,13 @@ class FileParser(object):
         try:
             # Initialize Object
             self.infile = open(fname, 'r')
-            self.blacklist = set()
+            self.stop = set()
             self.negation = set()
 
             # Initialize Blacklist
-            with open('input/blacklist.txt', 'r') as bf:
+            with open('input/stop.txt', 'r') as bf:
                 for word in bf:
-                    self.blacklist.add(word.lower().strip())
+                    self.stop.add(word.lower().strip())
 
             # Initialize Negation Dictionary
             with open('input/negation.txt', 'r') as neg:
@@ -39,21 +41,22 @@ class FileParser(object):
         count = {}
 
         s = ''.join(c for c in s.lower() if c in string.ascii_letters + ' ')
-        s = s.split()
 
         # Detects whether negation detected
         neg = 1
 
         # Parse Each Word Found in the String
-        for x in s:
+        for x in s.split():
             # Ignore 1 length words
-            if(len(x) <= 1):
+            # if(len(x) <= 2):
+            #    continue
+            if x in self.stop:
                 continue
 
             # Check for negation
-            if x in self.negation:
+            '''if x in self.negation:
                 neg *= -1
-                continue
+                continue'''
 
             # Update the count for the word
             if x in count:
@@ -62,7 +65,7 @@ class FileParser(object):
                 count[x] = neg
 
             # Reset Negation
-            neg = 1
+            # neg = 1
         return count
 
 
@@ -70,6 +73,14 @@ class TrainingParser(FileParser):
 
     def __init__(self, fname):
         FileParser.__init__(self, fname)
+
+        # Initialize List of Training Data
+        self.train = []
+        self.rating = []
+        for review in self.infile:
+            review = review.strip()
+            self.rating.append(int(review[-1:]))
+            self.train.append(self.cleanse(review))
 
     def __del__(self):
         FileParser.__del__(self)

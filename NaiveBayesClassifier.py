@@ -17,7 +17,26 @@ class NaiveBayesClassifier(object):
 
         # Open FileParsers
         train = TrainingParser("input/training.txt")
+        self.train = train.train
+        self.rating = train.rating
+        train.__del__
+
+        # Build Naive Bayes Variables
+        self.pdocs = 0  # Number of Positive Documents
+        self.ndocs = 0  # Number of Negative Documents
+
+        # Count Total Number of Documents
+        for rat in self.rating:
+            if rat == 0:
+                self.ndocs += 1
+            else:
+                self.pdocs += 1
+
+        # Parse Each Test
         test = TestParser("input/testing.txt")
+
+        test.__del__
+
 
 
 init = NaiveBayesClassifier()
