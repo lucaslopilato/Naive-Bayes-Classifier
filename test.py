@@ -5,14 +5,16 @@ from NaiveBayesClassifier import *
 class TestFileParser(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.p = FileParser('input/testing.txt')
-        self.t = TrainingParser('input/training.txt')
         self.b = NaiveBayesClassifier()
+        self.p = FileParser()
+        self.epsilon = 0.000001
 
-    @classmethod
-    def tearDownClass(self):
-        self.p.__del__
-        self.t.__del__
+    # @classmethod
+    # def tearDownClass(self):
+
+    def floatEquals(self, actual, expected):
+        if((actual - expected) > self.epsilon):
+            self.fail("%f is not near %f" % (actual, expected))
 
     def test_mainInit(self):
         # Test Data Handoff from FileParser
@@ -22,7 +24,7 @@ class TestFileParser(unittest.TestCase):
         self.assertEqual(self.b.rating[2], 0)
 
         # Test Class Counts
-        self.assertEqual(self.b.ndocs + self.b.pdocs, 5000)
+        # self.assertEqual(len(self.b.positive) + len(self.b.negative), 5000)
 
     def test_blacklist(self):
         self.assertNotIn('luke', self.p.stop)
@@ -43,43 +45,53 @@ class TestFileParser(unittest.TestCase):
             {'tim': 1, 'funny': -1})'''
 
     def test_cleanseFile(self):
-            self.assertEqual(len(self.t.train), 5000)
+            train = self.p.getReviews('input/training.txt')
+            self.assertEqual(len(train), 5000)
             # Test Stop Words
-            self.assertNotIn('the', self.t.train[0])
-            self.assertNotIn('to', self.t.train[0])
-            self.assertNotIn('that', self.t.train[0])
-            self.assertNotIn('of', self.t.train[0])
-            self.assertNotIn('is', self.t.train[0])
-            self.assertNotIn('i', self.t.train[0])
-            self.assertNotIn('a', self.t.train[0])
-            self.assertNotIn('their', self.t.train[0])
-            self.assertNotIn('my', self.t.train[0])
-            self.assertNotIn('me', self.t.train[0])
-            self.assertNotIn('it', self.t.train[0])
-            self.assertNotIn('it', self.t.train[0])
-            self.assertNotIn('at', self.t.train[0])
-            self.assertNotIn('as', self.t.train[0])
-            self.assertNotIn('your', self.t.train[0])
-            self.assertNotIn('who', self.t.train[0])
-            self.assertNotIn('which', self.t.train[0])
-            self.assertNotIn('when', self.t.train[0])
-            self.assertNotIn('what', self.t.train[0])
+            self.assertNotIn('the', train[0])
+            self.assertNotIn('to', train[0])
+            self.assertNotIn('that', train[0])
+            self.assertNotIn('of', train[0])
+            self.assertNotIn('is', train[0])
+            self.assertNotIn('i', train[0])
+            self.assertNotIn('a', train[0])
+            self.assertNotIn('their', train[0])
+            self.assertNotIn('my', train[0])
+            self.assertNotIn('me', train[0])
+            self.assertNotIn('it', train[0])
+            self.assertNotIn('it', train[0])
+            self.assertNotIn('at', train[0])
+            self.assertNotIn('as', train[0])
+            self.assertNotIn('your', train[0])
+            self.assertNotIn('who', train[0])
+            self.assertNotIn('which', train[0])
+            self.assertNotIn('when', train[0])
+            self.assertNotIn('what', train[0])
 
             # Test Things that should be in the first review
-            self.assertIn('high', self.t.train[0])
-            self.assertIn('bromwell', self.t.train[0])
-            self.assertIn('teachers', self.t.train[0])
-            self.assertIn('student', self.t.train[0])
-            self.assertIn('students', self.t.train[0])
-            self.assertIn('school', self.t.train[0])
-            self.assertIn('school', self.t.train[0])
-            self.assertIn('welcome', self.t.train[0])
-            self.assertIn('tried', self.t.train[0])
-            self.assertIn('time', self.t.train[0])
-            self.assertIn('think', self.t.train[0])
-            self.assertIn('teaching', self.t.train[0])
-            self.assertIn('survive', self.t.train[0])
-            self.assertIn('teachers', self.t.train[0])
+            self.assertIn('high', train[0])
+            self.assertIn('bromwell', train[0])
+            self.assertIn('teachers', train[0])
+            self.assertIn('student', train[0])
+            self.assertIn('students', train[0])
+            self.assertIn('school', train[0])
+            self.assertIn('school', train[0])
+            self.assertIn('welcome', train[0])
+            self.assertIn('tried', train[0])
+            self.assertIn('time', train[0])
+            self.assertIn('think', train[0])
+            self.assertIn('teaching', train[0])
+            self.assertIn('survive', train[0])
+            self.assertIn('teachers', train[0])
+
+    def test_accuracy(self):
+        expected = [0, 1, 1, 0, 0, 0, 1, 1, 0, 1]
+        actual = [0, 1, 1, 0, 0, 0, 1, 1, 0, 1]
+        acc = self.b.accuracy(expected, actual)
+        self.floatEquals(acc, 1)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
