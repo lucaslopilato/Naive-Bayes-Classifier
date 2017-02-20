@@ -6,6 +6,7 @@
 from collections import defaultdict
 from FileParser import *
 import time
+from math import log10
 
 
 class NaiveBayesClassifier(object):
@@ -78,11 +79,16 @@ class NaiveBayesClassifier(object):
 
     # Guess the class of the review
     def guess(self, review):
+        pos = log10(float(len(self.positive)) / float(len(self.rating)))
+        neg = log10(float(len(self.negative)) / float(len(self.rating)))
 
         for word in review:
             try:
+                pos += log10(self.probGivenClass(review, word, self.positive))
+            except:
                 pass
             try:
+                neg += log10(self.probGivenClass(review, word, self.negative))
             except:
                 pass
             # except:
