@@ -27,6 +27,7 @@ class NaiveBayesClassifier(object):
         total = float(self.train.positiveDocs + self.train.negativeDocs)
         self.positive = self.train.positiveDocs / total
         self.negative = self.train.negativeDocs / total
+        self.totalWords = float(len(self.train.positiveWords) + len(self.train.negativeWords))
 
         # Test Against Testing Set
         testt = time()
@@ -35,7 +36,7 @@ class NaiveBayesClassifier(object):
 
         # Print Results
         print("%d seconds (training)" % traint)
-        print("%d seconds (testing)" % testt)
+        print("%d seconds (labeling)" % testt)
 
         # Test and Print Results against training set
         print("%0.3f (training)" % self.test(training))
@@ -73,7 +74,7 @@ class NaiveBayesClassifier(object):
         return (correct / total)
 
     # Guess the class of the set of words
-    def guess(self, words):
+    '''def guess(self, words):
         positive = log10(self.positive)
         negative = log10(self.negative)
 
@@ -90,8 +91,48 @@ class NaiveBayesClassifier(object):
         if positive > negative:
             return 1
         else:
-            return 0
+            return 0'''
 
+    def guess(self, words):
+        positive = log10(self.positive)
+        negative = log10(self.negative)
+
+        for word in words:
+            # Calculate Total Occurrances of Word
+            totalOfWord = float(self.train.positiveWords[word] + self.train.negativeWords[word])
+            try:
+                # P(Word | Positive)
+                pos = (log10(self.train.positiveWords[word]) - log10(totalOfWord))
+
+                # P(Word)
+                pos += (log10(totalOfWord) - log10(self.totalWords))
+
+                # P(Positive)
+                pos -= log10(self.positive)
+
+                # P(Word | Negative)
+                neg = (log10(self.train.negativeWords[word]) - log10(totalOfWord))
+
+                # P(Word)
+                neg += (log10(totalOfWord) - log10(self.totalWords))
+
+                # P(Negative)
+                neg -= log10(self.negative)
+
+                # P(Positive | Word) =
+                # P(Word | Positive) * P(Word) / P(Positive)
+                positive += pos
+
+                # P(Negative | Word) = 
+                # P(Word | Negative) * P(Word) / P(Negative)
+                negative += neg
+            except:
+                pass
+
+        if positive > negative:
+            return 1
+        else:
+            return 0
 
 if __name__ == '__main__':
     if len(argv) != 3:
