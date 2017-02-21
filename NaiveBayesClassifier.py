@@ -9,7 +9,7 @@ from time import time
 from collections import defaultdict
 
 # Local Imports
-from FileParser import *
+from Trainer import *
 
 
 class NaiveBayesClassifier(object):
@@ -20,7 +20,7 @@ class NaiveBayesClassifier(object):
 
         # Train
         traint = time()
-        self.train = FileParser(training)
+        self.train = Trainer(training)
         traint = time() - traint
 
         # Calculate Probability Of Each Class
@@ -110,6 +110,8 @@ class NaiveBayesClassifier(object):
                 # P(Positive)
                 pos -= log10(self.positive)
 
+                # P(Positive | Word) =
+                # P(Word | Positive) * P(Word) / P(Positive)
                 # P(Word | Negative)
                 neg = (log10(self.train.negativeWords[word]) - log10(totalOfWord))
 
@@ -119,13 +121,10 @@ class NaiveBayesClassifier(object):
                 # P(Negative)
                 neg -= log10(self.negative)
 
-                # P(Positive | Word) =
-                # P(Word | Positive) * P(Word) / P(Positive)
-                positive += pos
-
                 # P(Negative | Word) = 
                 # P(Word | Negative) * P(Word) / P(Negative)
                 negative += neg
+                positive += pos
             except:
                 pass
 
