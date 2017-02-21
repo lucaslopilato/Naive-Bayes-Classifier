@@ -32,8 +32,9 @@ class Trainer(object):
                     self.negativeDocs += 1
                     self.cleanse(review, self.negativeWords)
                 else:
-                    print('BAD REVIEW: %s' % review)
-                    raise ValueError('Error... rating could not be parsed')
+                    pass
+                    # print('BAD REVIEW: %s' % review)
+                    # raise ValueError('Error... rating could not be parsed')
 
         # Initialize Blacklist
         if stop:

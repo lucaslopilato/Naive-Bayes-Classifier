@@ -16,11 +16,12 @@ class NaiveBayesClassifier(object):
 
     def __init__(self,
                  training="input/training.txt",
-                 testing="input/testing.txt"):
+                 testing="input/testing.txt",
+                 stop=False):
 
         # Train
         traint = time()
-        self.train = Trainer(training)
+        self.train = Trainer(training, stop)
         traint = time() - traint
 
         # Calculate Probability Of Each Class
@@ -59,9 +60,12 @@ class NaiveBayesClassifier(object):
                 # Reset Words for the Review
                 words = defaultdict(int)
                 review = review.strip().lower()
-                expected = int(review[-1])  # Get Expected
-                self.train.cleanse(review, words)  # Read In Review's Words
-                actual = self.guess(words)  # Guess Based on Words
+                try:
+                    expected = int(review[-1])  # Get Expected
+                    self.train.cleanse(review, words)  # Read In Review's Words
+                    actual = self.guess(words)  # Guess Based on Words
+                except:
+                    continue
 
                 # Print If Needed
                 if pr:
@@ -138,4 +142,4 @@ if __name__ == '__main__':
         print('Usage: python NaiveBayesClassifier.py training.txt testing.txt')
         exit(1)
 
-    init = NaiveBayesClassifier(argv[1], argv[2])
+    init = NaiveBayesClassifier(argv[1], argv[2].rstrip('\n\r'), stop=True)

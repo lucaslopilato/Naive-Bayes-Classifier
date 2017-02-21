@@ -8,7 +8,7 @@ class TestNaiveBayes(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         # self.b = NaiveBayesClassifier("input/double.txt")
-        self.b = NaiveBayesClassifier()
+        self.b = NaiveBayesClassifier(stop=True)
 
     # @classmethod
     # def tearDownClass(self):
