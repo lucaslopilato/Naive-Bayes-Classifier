@@ -11,21 +11,9 @@ from math import log10
 
 class NaiveBayesClassifier(object):
 
-    def buildTotalClasses(self):
-        for i in range(0, len(self.rating)):
-            for word in self.train[i]:
-                if(self.rating[i] == 0):
-                    if word in self.negative:
-                        self.negative[word] += self.train[i][word]
-                    else:
-                        self.negative[word] = 0
-                else:
-                    if word in self.positive:
-                        self.positive[word] += self.train[i][word]
-                    else:
-                        self.positive[word] = 0
-
-    def __init__(self, training="input/training.txt", testing="input/testing.txt"):
+    def __init__(self,
+                 training="input/training.txt",
+                 testing="input/testing.txt"):
         # TODO Remove
         # Parse Command Line Arguments
         # args = str(sys.argv)
@@ -34,73 +22,76 @@ class NaiveBayesClassifier(object):
         NaiveBayesClassifier.py training.txt testing.txt")"""
         # Begin Timing
 
+        # Train
         traint = time.time()
-
-        # Open FileParsers
-        train = FileParser()
-        self.train = train.getReviews(training)
-        self.rating = train.getRatings(training)
-
-        # Build Total Class Dictionary
-        self.positive = defaultdict(int)
-        self.negative = defaultdict(int)
-        self.buildTotalClasses()
-
-        # End Timing and Print
+        self.train = FileParser(training)
         traint = time.time() - traint
 
-        testt = time.time()
-        self.expected = train.getRatings(testing)
-        self.actual = []
-        for test in train.getReviews(testing):
-            self.actual.append(self.guess(test))
-            print(str(self.actual[-1]))
+        # Calculate Probability Of Each Class
+        total = float(self.train.positiveDocs + self.train.negativeDocs)
+        self.positive = self.train.positiveDocs / total
+        self.negative = self.train.negativeDocs / total
 
+        # Test Against Testing Set
+        testt = time.time()
+        trainAcc = self.test(testing, True)
         testt = time.time() - testt
 
-        print("%0.3f (testing)" % self.accuracy(self.expected, self.actual))
+        print("%0.3f (training)" % self.test(training))
+        print("%0.3f (testing)" % trainAcc)
         print("%1f seconds (training)" % traint)
         print("%1f seconds (testing)" % testt)
 
-    # Returns Probabililty of Word Given Class
-    def probGivenClass(self, review, word, given, alpha=0):
-        try:
-            return float(review[word] + alpha) / float(given[word] + alpha)
-        except:
-            return 0
+    # Run a full test
+    def test(self, file, pr=False):
+        # Initialize Testing Variables
+        correct = 0.0
+        total = 0.0
+        expected = -1
+        actual = -1
 
-    def accuracy(self, expected, actual):
-        correct = 0
-        for i in range(0, len(expected)):
-            if(expected[i] == actual[i]):
-                correct += 1
+        # Test Training Against Itself
+        with open(file, 'r') as tests:
+            for review in tests:
+                # Count Total Tests
+                total += 1.0
 
-        return float(correct) / len(expected)
+                # Reset Words for the Review
+                words = defaultdict(int)
+                review = review.strip().lower()
+                expected = int(review[-1])  # Get Expected
+                self.train.cleanse(review, words)  # Read In Review's Words
+                actual = self.guess(words)  # Guess Based on Words
 
-    # Guess the class of the review
-    def guess(self, review):
-        pos = log10(float(len(self.positive)) / float(len(self.rating)))
-        neg = log10(float(len(self.negative)) / float(len(self.rating)))
+                if pr:
+                    print(actual)
 
-        for word in review:
+                # Check Results
+                if actual == expected:
+                    correct += 1.0
+
+        return (correct / total)
+
+    # Guess the class of the set of words
+    def guess(self, words):
+        positive = log10(self.positive)
+        negative = log10(self.negative)
+
+        for word in words:
             try:
-                pos += log10(self.probGivenClass(review, word, self.positive))
+                positive += log10(self.train.positiveWords[word])
             except:
                 pass
             try:
-                neg += log10(self.probGivenClass(review, word, self.negative))
+                negative += log10(self.train.negativeWords[word])
             except:
                 pass
-            # except:
-            #     continue
 
-        if pos > neg:
+        if positive > negative:
             return 1
         else:
             return 0
 
 
-
-
-
-init = NaiveBayesClassifier()
+if __name__ == '__main__':
+    init = NaiveBayesClassifier()
