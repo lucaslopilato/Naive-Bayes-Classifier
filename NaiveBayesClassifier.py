@@ -81,13 +81,13 @@ class NaiveBayesClassifier(object):
     # Guess Based on multiple algorithms
     def guess(self, words):
         # Cannot stress this enough
-        total = 3  # MAKE SURE CORRECT
+        total = 2  # MAKE SURE CORRECT
         # Traditional Bayes Rule
         pos = float(self.bayes(words))
         # Laplace Smoothing
         pos += float(self.multinomialBayes(words))
 
-        pos += float(self.missing(words))
+        # pos += float(self.missing(words))
 
         if((pos / total) >= 0.5):
             return 1
