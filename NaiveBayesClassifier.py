@@ -196,4 +196,7 @@ if __name__ == '__main__':
         argv[1],
         argv[2].rstrip('\n\r'),
         stop=False,
-        stem=False)
+        stem=False,
+        pbayes=True,
+        pmultiBayes=False,
+        pmissing=False)
