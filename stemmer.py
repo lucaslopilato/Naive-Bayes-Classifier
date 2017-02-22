@@ -62,6 +62,15 @@ class stemmer(object):
         else:
             return False
 
+    def cvc(self, word):
+        l = len(word)
+        if (not self.isVowel(word, l - 3) and self.isVowel(word, l - 2) and
+            not self.isVowel(word, l - 1) and word[-1] != 'w' and
+                word[-1] != 'x'and word[-1] != 'y'):
+            return True
+        return False
+
+
     # Follows Porter Algorithm shown at 
     # http://snowball.tartarus.org/algorithms/porter/stemmer.html
     def stem(self, word):
@@ -87,8 +96,10 @@ class stemmer(object):
         elif word[-2:] == 'ed':
             if self.containsVowel(word[:-2]):
                 word = word[:-2]
+                word = self.steponesub(word)
         elif word[-3:] == 'ing' and self.containsVowel(word[:-3]):
             word = word[:-3]
+            word = self.steponesub(word)
 
         return word
 
@@ -101,3 +112,18 @@ class stemmer(object):
             word = word[:-2] + 'ble'
         elif word[-2:] == 'iz':
             word = word[:-2] + 'ize'
+        elif word[-3:] == 'ing':
+            hold = word[:-3]
+            if (self.doubleConst(hold) and hold[-1] != 'l' and
+                    hold[-1] != 's' and hold[-1] != 'z'):
+                word = hold[:-1]
+            elif self.measure(hold) == 1 and self.cvc(hold):
+                word = hold
+        elif word[-2:] == 'ed':
+            hold = word[:-2]
+            if (self.doubleConst(hold) and hold[-1] != 'l' and
+                    hold[-1] != 's' and hold[-1] != 'z'):
+                word = hold + 'e'
+
+        return word
+

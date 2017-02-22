@@ -42,6 +42,21 @@ class TestStemmer(unittest.TestCase):
         self.assertTrue(self.s.containsVowel('eatery'))
         self.assertFalse(self.s.containsVowel('ttmlpq'))
 
+    def test_doubleconst(self):
+        self.assertFalse(self.s.doubleConst('ea'))
+        self.assertFalse(self.s.doubleConst('ba'))
+        self.assertFalse(self.s.doubleConst('ab'))
+        self.assertTrue(self.s.doubleConst('tt'))
+        self.assertTrue(self.s.doubleConst('arnett'))
+        self.assertTrue(self.s.doubleConst('hopp'))
+
+    def test_cvc(self):
+        self.assertTrue(self.s.cvc('wil'))
+        self.assertTrue(self.s.cvc('hop'))
+        self.assertFalse(self.s.cvc('hix'))
+        self.assertFalse(self.s.cvc('hiy'))
+        self.assertFalse(self.s.cvc('hiw'))
+
     def test_onea(self):
         self.assertEqual(self.s.stepone('caresses'), 'caress')
         self.assertEqual(self.s.stepone('ponies'), 'poni')
@@ -54,12 +69,18 @@ class TestStemmer(unittest.TestCase):
         self.assertEqual(self.s.stepone('motoring'), 'motor')
         self.assertEqual(self.s.stepone('sing'), 'sing')
 
-    def test_doubleconst(self):
-        self.assertFalse(self.s.doubleConst('ea'))
-        self.assertFalse(self.s.doubleConst('ba'))
-        self.assertFalse(self.s.doubleConst('ab'))
-        self.assertTrue(self.s.doubleConst('tt'))
-        self.assertTrue(self.s.doubleConst('arnett'))
+        self.assertEqual(self.s.stepone('conflated'), 'conflate')
+        self.assertEqual(self.s.stepone('troubled'), 'trouble')
+        self.assertEqual(self.s.stepone('sized'), 'size')
+        self.assertEqual(self.s.stepone('hopping'), 'hop')
+        self.assertEqual(self.s.stepone('tanned'), 'tan')
+        self.assertEqual(self.s.stepone('falling'), 'fall')
+        self.assertEqual(self.s.stepone('hissing'), 'hiss')
+        self.assertEqual(self.s.stepone('fizzed'), 'fizz')
+        self.assertEqual(self.s.stepone('failing'), 'fail')
+        self.assertEqual(self.s.stepone('filing'), 'file')
+
+
 
 
 
@@ -68,4 +89,7 @@ class TestStemmer(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    hold = 'hopping'
+    hold = hold[:-3]
+
     unittest.main()

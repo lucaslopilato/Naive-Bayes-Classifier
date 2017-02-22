@@ -18,7 +18,14 @@ class NaiveBayesClassifier(object):
                  training="input/training.txt",
                  testing="input/testing.txt",
                  stop=False,
-                 stem=False):
+                 stem=False,
+                 pbayes=True,
+                 pmultiBayes=False,
+                 pmissing=False):
+
+        self.pbayes = pbayes
+        self.pmultiBayes = pmultiBayes
+        self.pmissing = pmissing
 
         # Train
         traint = time()
@@ -80,14 +87,20 @@ class NaiveBayesClassifier(object):
 
     # Guess Based on multiple algorithms
     def guess(self, words):
-        # Cannot stress this enough
-        total = 2  # MAKE SURE CORRECT
-        # Traditional Bayes Rule
-        pos = float(self.bayes(words))
-        # Laplace Smoothing
-        pos += float(self.multinomialBayes(words))
+        total = self.pbayes + self.pmultiBayes + self.pmissing
 
-        # pos += float(self.missing(words))
+        # Traditional Bayes Rule
+        pos = 0.0
+
+        if self.pbayes:
+            pos += float(self.bayes(words))
+
+        if self.pmultiBayes:
+            # Laplace Smoothing
+            pos += float(self.multinomialBayes(words))
+
+        if self.pmissing:
+            pos += float(self.missing(words))
 
         if((pos / total) >= 0.5):
             return 1
@@ -182,5 +195,5 @@ if __name__ == '__main__':
     init = NaiveBayesClassifier(
         argv[1],
         argv[2].rstrip('\n\r'),
-        stop=True,
-        stem=True)
+        stop=False,
+        stem=False)
