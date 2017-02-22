@@ -6,6 +6,7 @@
 import string
 from collections import defaultdict
 from strop import rfind
+from stemmer import stemmer
 
 
 class Trainer(object):
@@ -18,8 +19,13 @@ class Trainer(object):
         self.positiveDocs = 0
         self.negativeWords = defaultdict(int)
         self.negativeDocs = 0
+        self.totalPositiveWords = 0.0
+        self.totalNegativeWords = 0.0
         self.stop = set()
-        # self.stem = []
+        if stem:
+            self.stem = stemmer()
+        else:
+            self.stem = None
 
         # Train the dataset
         with open(train, 'r') as training:
@@ -27,10 +33,10 @@ class Trainer(object):
                 review = review.strip().lower()
                 if review[-1] == '1':
                     self.positiveDocs += 1
-                    self.cleanse(review, self.positiveWords)
+                    self.cleanse(review, self.positiveWords, self.totalPositiveWords)
                 elif review[-1] == '0':
                     self.negativeDocs += 1
-                    self.cleanse(review, self.negativeWords)
+                    self.cleanse(review, self.negativeWords, self.totalNegativeWords)
                 else:
                     pass
                     # print('BAD REVIEW: %s' % review)
@@ -47,7 +53,7 @@ class Trainer(object):
                 self.stem.append(word.lower().strip())'''
 
     # Writes the Found Review into the dictionary targetWords
-    def cleanse(self, review, targetWords):
+    def cleanse(self, review, targetWords, targetCount=None):
         review = ''.join(c for c in review if c in
                          string.ascii_letters + string.whitespace)
 
@@ -58,21 +64,9 @@ class Trainer(object):
             if x in self.stop:
                 continue
 
+            if(self.stem is not None):
+                x = self.stem.stem(x)
+
+            if(targetCount is not None):
+                targetCount += 1
             targetWords[x] += 1
-
-
-            # Stemming
-            ''' x = self.destem(x)
-            if len(x) < 3:
-                continue '''
-
-
-    def destem(self, string):
-
-        index = 0
-        for stem in self.stem:
-            index = rfind(string, stem)
-            if(index != -1 and index + len(stem) == len(string)):
-                return string[:index]
-
-        return string
