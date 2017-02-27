@@ -39,18 +39,12 @@ class Trainer(object):
                     self.cleanse(review, self.negativeWords, self.totalNegativeWords)
                 else:
                     pass
-                    # print('BAD REVIEW: %s' % review)
-                    # raise ValueError('Error... rating could not be parsed')
 
         # Initialize Blacklist
         if stop:
             with open('input/stop.txt', 'r') as bf:
                 for word in bf:
                     self.stop.add(word.lower().strip())
-
-        '''with open('input/stem.txt', 'r') as stem:
-            for word in stem:
-                self.stem.append(word.lower().strip())'''
 
     # Writes the Found Review into the dictionary targetWords
     def cleanse(self, review, targetWords, targetCount=None):

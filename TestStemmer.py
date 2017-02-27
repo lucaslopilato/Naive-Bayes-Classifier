@@ -81,15 +81,5 @@ class TestStemmer(unittest.TestCase):
         self.assertEqual(self.s.stepone('filing'), 'file')
 
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
-    hold = 'hopping'
-    hold = hold[:-3]
-
     unittest.main()

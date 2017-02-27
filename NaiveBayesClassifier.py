@@ -17,6 +17,7 @@ class NaiveBayesClassifier(object):
     def __init__(self,
                  training="input/training.txt",
                  testing="input/testing.txt",
+                 top10=False,
                  stop=False,
                  stem=False,
                  pbayes=True,
@@ -26,6 +27,7 @@ class NaiveBayesClassifier(object):
         self.pbayes = pbayes
         self.pmultiBayes = pmultiBayes
         self.pmissing = pmissing
+        self.top10 = top10
 
         # Train
         traint = time()
@@ -61,6 +63,7 @@ class NaiveBayesClassifier(object):
 
         # Get Tests To Run
         with open(file, 'r') as tests:
+            top10 = {}
             for review in tests:
                 # Count Total Tests
                 total += 1.0
@@ -72,6 +75,8 @@ class NaiveBayesClassifier(object):
                     expected = int(review[-1])  # Get Expected
                     self.train.cleanse(review, words)  # Read In Review's Words
                     actual = self.guess(words)  # Guess Based on Words
+                    if self.top10:
+                        top10 = self.topTen(words, top10)
                 except:
                     continue
 
@@ -83,6 +88,8 @@ class NaiveBayesClassifier(object):
                 if actual == expected:
                     correct += 1.0
 
+            if self.top10:
+                print(top10)
         return (correct / total)
 
     # Guess Based on multiple algorithms
@@ -97,7 +104,8 @@ class NaiveBayesClassifier(object):
 
         if self.pmultiBayes:
             # Laplace Smoothing
-            pos += float(self.multinomialBayes(words))
+            if self.multinomialBayes(words) > 0:
+                pos += 1
 
         if self.pmissing:
             pos += float(self.missing(words))
@@ -139,10 +147,7 @@ class NaiveBayesClassifier(object):
             except:
                 continue
 
-        if positive >= negative:
-            return 1
-        else:
-            return 0
+        return (positive - negative)
 
     def bayes(self, words):
         positive = log10(self.positive)
@@ -186,6 +191,19 @@ class NaiveBayesClassifier(object):
         else:
             return 0
 
+    def topTen(self, words, top10):
+        for word in words:
+            value = abs(self.multinomialBayes([word]))
+            if len(top10) < 10:
+                top10[word] = value
+            else:
+                sorted10 = sorted(top10.items(), key=operator.itemgetter(1))
+                if value > sorted10[-1]:
+                    top10.remove(sorted10[-1])
+                    top10[word] = value
+
+        return top10
+
 
 if __name__ == '__main__':
     if len(argv) != 3:
@@ -195,6 +213,7 @@ if __name__ == '__main__':
     init = NaiveBayesClassifier(
         argv[1],
         argv[2].rstrip('\n\r'),
+        top10=False,
         stop=False,
         stem=False,
         pbayes=True,
